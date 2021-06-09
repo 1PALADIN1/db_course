@@ -112,7 +112,7 @@ INSERT INTO profiles VALUES (1, 'm', '1997-12-01', NULL, 'Moscow', 'Russia'); --
 INSERT INTO profiles VALUES (2, 'm', '1988-11-02', NULL, 'Moscow', 'Russia'); -- профиль Васи
 
 -- вызовет ошибку
-INSERT INTO profiles VALUES (3, 'm', '1988-11-02', NULL, 'Moscow', 'Russia'); -- профиль Васи
+-- INSERT INTO profiles VALUES (3, 'm', '1988-11-02', NULL, 'Moscow', 'Russia'); -- профиль Васи
 
 -- Добавим два сообщения от Пети к Васе, одно сообщение от Васи к Пете
 INSERT INTO messages VALUES (DEFAULT, 1, 2, 'Hi!', 1, DEFAULT, DEFAULT); -- сообщение от Пети к Васе номер 1
@@ -166,3 +166,64 @@ ADD CONSTRAINT phone_check
 CHECK (REGEXP_LIKE(phone, '^[0-9]{11}$'));
 
 DESCRIBE users;
+
+-- Таблица с лайками для медиа файлов
+CREATE TABLE media_likes (
+    media_id BIGINT UNSIGNED NOT NULL,
+    from_user_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (media_id, from_user_id),
+    KEY (media_id),
+  	KEY (from_user_id),
+  	CONSTRAINT fk_media_likes_media_id FOREIGN KEY (media_id) REFERENCES media (id),
+  	CONSTRAINT fk_media_likes_user_id FOREIGN KEY (from_user_id) REFERENCES users (id)
+);
+
+-- Таблица с лайками для пользователей
+CREATE TABLE user_likes (
+    user_id BIGINT UNSIGNED NOT NULL,
+    from_user_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (user_id, from_user_id),
+    KEY (user_id),
+  	KEY (from_user_id),
+  	CONSTRAINT fk_user_likes_user_id FOREIGN KEY (user_id) REFERENCES users (id),
+  	CONSTRAINT fk_user_likes_from_user_id FOREIGN KEY (from_user_id) REFERENCES users (id)
+);
+
+-- Пользователь не может сам себя лайкнуть
+ALTER TABLE user_likes 
+ADD CONSTRAINT user_like_himself_check 
+CHECK (user_id != from_user_id);
+
+-- Таблица с постами
+CREATE TABLE posts (
+	id SERIAL PRIMARY KEY,
+    post_name VARCHAR(500),
+    post_text VARCHAR(10000),
+    user_id BIGINT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY (user_id),
+    CONSTRAINT fk_posts_user_id FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+-- Прикреплённые к постам медиафайлы
+CREATE TABLE posts_media (
+	post_id BIGINT UNSIGNED NOT NULL,
+    media_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (post_id, media_id),
+    KEY (post_id),
+  	KEY (media_id),
+  	CONSTRAINT fk_posts_media_post_id FOREIGN KEY (post_id) REFERENCES posts (id),
+  	CONSTRAINT fk_posts_media_media_id FOREIGN KEY (media_id) REFERENCES media (id)
+);
+
+-- Таблица с лайками для постов
+CREATE TABLE posts_likes (
+	post_id BIGINT UNSIGNED NOT NULL,
+    from_user_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (post_id, from_user_id),
+    KEY (post_id),
+  	KEY (from_user_id),
+  	CONSTRAINT fk_posts_likes_post_id FOREIGN KEY (post_id) REFERENCES posts (id),
+  	CONSTRAINT fk_posts_likes_user_id FOREIGN KEY (from_user_id) REFERENCES users (id)
+);
