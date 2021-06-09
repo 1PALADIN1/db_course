@@ -84,6 +84,7 @@ CREATE TABLE communities (
 CREATE TABLE communities_users (
 	community_id BIGINT UNSIGNED NOT NULL,
 	user_id BIGINT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (community_id, user_id),
 	KEY (community_id),
   	KEY (user_id),
@@ -103,3 +104,6 @@ CHECK (from_user_id != to_user_id);
 ALTER TABLE users 
 ADD CONSTRAINT phone_check
 CHECK (REGEXP_LIKE(phone, '^[0-9]{11}$'));
+
+-- Последние изменения
+ALTER TABLE users DROP CONSTRAINT phone_check;
