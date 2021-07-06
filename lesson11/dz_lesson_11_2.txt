@@ -1,0 +1,100 @@
+# 1. В базе данных Redis подберите коллекцию для подсчета посещений с определенных IP-адресов.
+
+# Выбираю коллекцию хэшсет, в которой уникальным ключом выступает ip адрес, а значением - количество посещений
+
+127.0.0.1:6379> HSET ip_addr 127.0.0.1 0
+(integer) 1
+127.0.0.1:6379> HSET ip_addr 127.0.0.2 0
+(integer) 1
+127.0.0.1:6379> HSET ip_addr 127.0.0.3 0
+(integer) 1
+127.0.0.1:6379> HVALS ip_addr
+1) "0"
+2) "0"
+3) "0"
+127.0.0.1:6379> 
+127.0.0.1:6379> HEXISTS ip_addr 127.0.0.1
+(integer) 1
+127.0.0.1:6379>
+127.0.0.1:6379> HGET ip_addr 127.0.0.1
+"0"
+127.0.0.1:6379> HINCRBY ip_addr 127.0.0.1 1
+(integer) 1
+127.0.0.1:6379> HGET ip_addr 127.0.0.1
+"1"
+
+# 2. При помощи базы данных Redis решите задачу поиска имени пользователя по электронному адресу и наоборот, поиск электронного адреса пользователя по его имени.
+
+# Предлагаю для задачи использовать коллекцию HSET, у которой ключ - электронный адрес, значение - имя пользователя
+127.0.0.1:6379> HMSET contacts test1@mail.ru Igor test2@mail.ru Natasha test3@mail.ru Victor
+OK
+127.0.0.1:6379> HVALS contacts
+1) "Igor"
+2) "Natasha"
+3) "Victor"
+127.0.0.1:6379> 
+
+# Также предлагаю создать HSET, где ключом будет выступать пользователь, а значением - электронный адрес
+127.0.0.1:6379> HMSET contact_names Igor test1@mail.ru Natasha test2@mail.ru Victor test3@mail.ru
+OK
+127.0.0.1:6379> HVALS contact_names
+1) "test1@mail.ru"
+2) "test2@mail.ru"
+3) "test3@mail.ru"
+
+
+# поиск по электронной почте
+127.0.0.1:6379> HGET contacts test1@mail.ru
+"Igor"
+
+# поиск по имени
+127.0.0.1:6379> HGET contact_names Natasha
+"test2@mail.ru"
+
+# 3. Организуйте хранение категорий и товарных позиций учебной базы данных shop в СУБД MongoDB.
+
+> use shop
+switched to db shop
+> db.createCollection("catalogs")
+{ "ok" : 1 }
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+shop    0.000GB
+> show tables
+catalogs
+> db.catalogs.insert({name: 'Процессоры'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name: 'Материнские платы'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name: 'Видеокарты'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name: 'Жесткие диски'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.insert({name: 'Оперативная память'})
+WriteResult({ "nInserted" : 1 })
+> db.catalogs.find()
+{ "_id" : ObjectId("60e330b11c12d17c8882cc79"), "name" : "Процессоры" }
+{ "_id" : ObjectId("60e330b81c12d17c8882cc7a"), "name" : "Материнские платы" }
+{ "_id" : ObjectId("60e330bf1c12d17c8882cc7b"), "name" : "Видеокарты" }
+{ "_id" : ObjectId("60e330c51c12d17c8882cc7c"), "name" : "Жесткие диски" }
+{ "_id" : ObjectId("60e330cc1c12d17c8882cc7d"), "name" : "Оперативная память" }
+> 
+> db.createCollection("products")
+{ "ok" : 1 }
+> show tables
+catalogs
+products
+> 
+> db.products.insert({name: 'Intel Core i3-8100', description: 'Процессор для настольных персональных компьютеров, основанных на платформе Intel.', price: 7890.00, catalog_id: new ObjectId("60e330b11c12d17c8882cc79")})
+WriteResult({ "nInserted" : 1 })
+> db.products.insert({name: 'Intel Core i5-7400', description: 'Процессор для настольных персональных компьютеров, основанных на платформе Intel.', price: 4780.00, catalog_id: new ObjectId("60e330b11c12d17c8882cc79")})
+WriteResult({ "nInserted" : 1 })
+> db.products.insert({name: 'MSI B250M GAMING PRO', description: 'Материнская плата MSI B250M GAMING PRO, B250, Socket 1151, DDR4, mATX', price: 5060.00, catalog_id: new ObjectId("60e330b81c12d17c8882cc7a")})
+WriteResult({ "nInserted" : 1 })
+> db.products.find()
+{ "_id" : ObjectId("60e331b81c12d17c8882cc7e"), "name" : "Intel Core i3-8100", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе Intel.", "price" : 7890, "catalog_id" : ObjectId("60e330b11c12d17c8882cc79") }
+{ "_id" : ObjectId("60e332141c12d17c8882cc7f"), "name" : "Intel Core i5-7400", "description" : "Процессор для настольных персональных компьютеров, основанных на платформе Intel.", "price" : 4780, "catalog_id" : ObjectId("60e330b11c12d17c8882cc79") }
+{ "_id" : ObjectId("60e3321b1c12d17c8882cc80"), "name" : "MSI B250M GAMING PRO", "description" : "Материнская плата MSI B250M GAMING PRO, B250, Socket 1151, DDR4, mATX", "price" : 5060, "catalog_id" : ObjectId("60e330b81c12d17c8882cc7a") }
+
