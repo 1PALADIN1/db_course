@@ -221,9 +221,8 @@ DROP TABLE IF EXISTS global_chat;
 CREATE TABLE global_chat (
     id SERIAL PRIMARY KEY,
     message VARCHAR(255),
-    from_user_id BIGINT UNSIGNED NOT NULL,
+    from_character_id BIGINT UNSIGNED NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY (from_user_id),
-    CONSTRAINT fk_global_chat_users FOREIGN KEY (from_user_id) REFERENCES users (id)
+    KEY (from_character_id),
+    CONSTRAINT fk_global_chat_characters FOREIGN KEY (from_character_id) REFERENCES characters (id)
 ) COMMENT 'Чат';
-
