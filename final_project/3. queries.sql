@@ -100,6 +100,7 @@ SELECT ch.name, t.inventory_id, t.total_price FROM characters ch
 JOIN
     (SELECT ii.inventory_id, SUM(sh.buy_price) as total_price FROM shop sh
     LEFT JOIN inventories_items ii ON sh.item_id = ii.id
+    WHERE sh.buy_currency_id = (SELECT c.id FROM currencies c WHERE c.name = 'Gold')
     GROUP BY ii.inventory_id) t ON ch.inventory_id = t.inventory_id
 ORDER BY total_price DESC;
 
@@ -145,7 +146,7 @@ SELECT i.name, ci.damage_boost FROM consumable_items ci
 JOIN items i on ci.id = i.id
 WHERE ci.damage_boost IS NOT NULL AND ci.damage_boost > 0;
 
-/* Экипировка, которая увеличивает макс. уровень здоровья и её цена в магазине */
+/* Экипировка, которая увеличивает макс. уровень здоровья и её цена в магазине (если она там есть) */
 
 SELECT i.name, ei.health_boost, s.buy_price, s.sell_price FROM equip_items ei
 JOIN items i on ei.id = i.id

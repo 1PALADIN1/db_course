@@ -87,7 +87,7 @@ CREATE TABLE consumable_items (
     max_manna_boost INT NOT NULL DEFAULT 0 COMMENT 'Прирост к макс. уровню манны',
     manna_restore INT NOT NULL DEFAULT 0 COMMENT 'Количество восстанавливаемой манны',
     critical_hit_chance_boost INT NOT NULL DEFAULT 0 COMMENT 'Доп. бонус к шансу крит. урона',
-    duration FLOAT NOT NULL COMMENT 'Время действия (сек.)', -- NULL - применяется мгновенно
+    duration FLOAT NOT NULL DEFAULT 0 COMMENT 'Время действия (сек.)', -- NULL - применяется мгновенно
     FOREIGN KEY (id) REFERENCES items(id)
 ) COMMENT 'Расходники';
 
@@ -209,6 +209,7 @@ CREATE TABLE shop (
     KEY (buy_currency_id),
     KEY (sell_currency_id),
     KEY (item_id),
+    UNIQUE (item_id),
     CONSTRAINT fk_shop_buy_currencies FOREIGN KEY (buy_currency_id) REFERENCES currencies (id),
     CONSTRAINT fk_shop_sell_currencies FOREIGN KEY (sell_currency_id) REFERENCES currencies (id),
     CONSTRAINT fk_shop_items FOREIGN KEY (item_id) REFERENCES items (id)
@@ -226,3 +227,14 @@ CREATE TABLE global_chat (
     KEY (from_character_id),
     CONSTRAINT fk_global_chat_characters FOREIGN KEY (from_character_id) REFERENCES characters (id)
 ) COMMENT 'Чат';
+
+
+/* 16. Архив для чата */
+
+DROP TABLE IF EXISTS archive_global_chat;
+CREATE TABLE archive_global_chat (
+  message_id INT UNSIGNED NOT NULL,
+  from_character_id INT UNSIGNED NOT NULL,
+  message VARCHAR(255) NOT NULL,
+  created_at DATETIME NOT NULL
+) COMMENT 'Архив для чата' ENGINE=Archive;

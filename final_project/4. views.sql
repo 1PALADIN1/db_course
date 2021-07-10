@@ -4,7 +4,10 @@ USE mmorpg_db;
 /* Подробная информация о персонажах игроков */
 
 CREATE OR REPLACE VIEW characters_info AS
-    SELECT u.id, u.email, c.name as character_name, c.exp, t.level, r.name as race_name FROM users u
+    SELECT u.id as user_id, u.email, c.id as character_id,
+           c.name as character_name, c.exp,
+           t.level, r.name as race_name
+    FROM users u
     JOIN characters c ON u.id = c.user_id
     JOIN races r ON c.race_id = r.id
     JOIN (SELECT ch.id, MAX(cl.level) as level
