@@ -1,3 +1,5 @@
+/* База данных для хранения информации по игре в жанре ММОРПГ */
+
 DROP DATABASE IF EXISTS mmorpg_db;
 CREATE DATABASE IF NOT EXISTS mmorpg_db;
 
