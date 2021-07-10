@@ -1,5 +1,6 @@
 USE mmorpg_db;
 
+/* =================== ВЫБОРКИ =================== */
 /* Количество персонажей у каждого игрока */
 
 SELECT u.id, u.email, t.total_characters FROM users u
@@ -133,8 +134,9 @@ WHERE a.available_level <=
 
 /* Отсортированный чат */
 
-SELECT ch.name as 'Character name', gc.created_at, gc.message FROM global_chat gc
+SELECT u.email, ch.name as character_name, gc.created_at, gc.message FROM global_chat gc
 JOIN characters ch on gc.from_character_id = ch.id
+LEFT JOIN users u on ch.user_id = u.id
 ORDER BY gc.created_at DESC;
 
 /* Расходка, которая даёт бонус к урону */
